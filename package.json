@@ -26,7 +26,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/sbty/fs-write-stream-atomic-modern.git"
+    "url": "git+https://github.com/sbty/fs-write-stream-atomic-modern.git"
   },
   "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
   "contributors": [
