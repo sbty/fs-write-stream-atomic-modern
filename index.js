@@ -1,8 +1,7 @@
-var fs = require('graceful-fs')
+var fs = require('node:fs')
 var Writable = require('readable-stream').Writable
 var util = require('util')
 var MurmurHash3 = require('imurmurhash')
-var iferr = require('iferr')
 var crypto = require('crypto')
 
 function murmurhex () {
@@ -82,14 +81,25 @@ function handleClose (writeStream) {
     if (writeStream.__atomicChown) {
       var uid = writeStream.__atomicChown.uid
       var gid = writeStream.__atomicChown.gid
-      return fs.chown(writeStream.__atomicTmp, uid, gid, iferr(cleanup, moveIntoPlace))
+      return fs.chown(writeStream.__atomicTmp, uid, gid, function (err) {
+        // Ownership must be applied to the temporary file before it becomes
+        // visible at the destination. On failure, preserve the original error
+        // and follow the same cleanup path as the reference implementation.
+        if (err) return cleanup(err)
+        moveIntoPlace()
+      })
     } else {
       moveIntoPlace()
     }
   }
 
   function moveIntoPlace () {
-    fs.rename(writeStream.__atomicTmp, writeStream.__atomicTarget, iferr(trapWindowsEPERM, end))
+    fs.rename(writeStream.__atomicTmp, writeStream.__atomicTarget, function (err) {
+      // A successful rename is the commit point. Do not emit `finish` before
+      // it completes; callers rely on the destination being ready at finish.
+      if (err) return trapWindowsEPERM(err)
+      end()
+    })
   }
 
   function trapWindowsEPERM (err) {

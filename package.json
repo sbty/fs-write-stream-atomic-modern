@@ -1,33 +1,40 @@
 {
-  "name": "fs-write-stream-atomic",
+  "name": "fs-write-stream-atomic-modern",
   "version": "1.0.10",
-  "description": "Like `fs.createWriteStream(...)`, but atomic.",
+  "description": "A compatibility-focused modern fork of fs-write-stream-atomic.",
   "main": "index.js",
+  "types": "index.d.ts",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "graceful-fs": "^4.1.2",
-    "iferr": "^1.0.2",
     "imurmurhash": "^0.1.4",
-    "readable-stream": "1 || 2"
+    "readable-stream": "^2.3.8"
   },
   "devDependencies": {
-    "rimraf": "^2.4.4",
-    "standard": "^5.4.1",
-    "tap": "^12.4.0"
+    "@types/node": "^22.0.0",
+    "fs-write-stream-atomic": "1.0.10",
+    "typescript": "^7.0.2"
   },
   "scripts": {
-    "test": "standard && tap --coverage test/*.js"
+    "test": "node --check index.js && node --test --test-concurrency=1 test-modern/*.test.js && npm run test:types",
+    "test:types": "tsc --noEmit --strict --target ES2022 --module Node16 --moduleResolution Node16 --types node test-d/index.ts",
+    "test:smoke": "node scripts/smoke-tarball.js"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/npm/fs-write-stream-atomic"
+    "url": "https://github.com/sbty/fs-write-stream-atomic-modern.git"
   },
   "author": "Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me/)",
+  "contributors": [
+    "sbty"
+  ],
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/npm/fs-write-stream-atomic/issues"
+    "url": "https://github.com/sbty/fs-write-stream-atomic-modern/issues"
   },
-  "homepage": "https://github.com/npm/fs-write-stream-atomic"
+  "homepage": "https://github.com/sbty/fs-write-stream-atomic-modern"
 }
